@@ -66,3 +66,11 @@ SELECT o.idOrder, c.Fname, p.Pname, s.SocialName AS vendedor, d.trackingCode, d.
 		JOIN productSeller ps ON p.idProduct = ps.idProduct
 	JOIN seller s ON ps.idSeller = s.idSeller
 JOIN delivery d ON o.idOrder = d.idOrder;
+
+-- Relação de produtos, fornecedores e estoque
+
+SELECT p.Pname, sup.SocialName, ps.quantity, st.storageLocation FROM product p
+    JOIN productSupplier ps ON p.idProduct = ps.idProduct
+        JOIN supplier sup ON ps.idSupplier = sup.idSupplier
+    JOIN storageLocation sl ON p.idProduct = sl.idProduct
+JOIN productStorage st ON sl.idStorage = st.idStorage;
