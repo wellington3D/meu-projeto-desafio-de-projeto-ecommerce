@@ -1,0 +1,68 @@
+use projeto_ecommerce;
+-- quantos produtos feitos por cada cliente
+SELECT c.Fname, COUNT(o.idOrder) AS total_pedidos
+	FROM client c
+	JOIN orders o ON c.idClient = o.idClient
+	GROUP BY c.idClient;
+
+-- quais vendedores também são fornecedores
+SELECT s.SocialName
+	FROM seller s
+	JOIN supplier sup ON s.CNPJ = sup.CNPJ;
+
+-- relaçõa de produtos, fornecedores e estoque
+SELECT p.Pname as Produtos, sup.SocialName as Fornecedores, ps.quantity, st.storageLocation as Armazenamento
+			FROM product p
+				JOIN productSupplier ps ON p.idProduct = ps.idProduct
+				JOIN supplier sup ON ps.idSupplier = sup.idSupplier
+				JOIN storageLocation sl ON p.idProduct = sl.idProduct
+				JOIN productStorage st ON sl.idStorage = st.idStorage;
+
+-- Relação de nomes de fornecedores e nomes dos produtos
+SELECT sup.SocialName AS fornecedor, p.Pname AS produto
+		FROM supplier sup
+		JOIN productSupplier ps ON sup.idSupplier = ps.idSupplier
+		JOIN product p ON ps.idProduct = p.idProduct;
+
+-- Filtros com where e ordenação
+SELECT Pname, avaliação FROM product
+	WHERE category = 'Eletronico'
+ORDER BY avaliação DESC;
+
+
+-- Having para filtrar grupos
+SELECT c.Fname, COUNT(o.idOrder) AS total FROM client c
+	JOIN orders o ON c.idClient = o.idClient
+		GROUP BY c.idClient
+		HAVING total > 1;
+
+-- Total de vendas por produto
+SELECT p.Pname, SUM(po.quantity) AS total_vendido FROM product p
+		JOIN productOrder po ON p.idProduct = po.idProduct
+	GROUP BY p.idProduct
+		ORDER BY total_vendido DESC;
+
+-- Valor total pago por pedido
+SELECT o.idOrder, SUM(p.amount) AS total_pago FROM orders o
+JOIN payment p ON o.idOrder = p.idOrder
+GROUP BY o.idOrder;
+
+-- Produtos em estoque abaixo de 50 unidades
+ SELECT p.Pname, ps.quantity FROM product p
+	JOIN productSupplier ps ON p.idProduct = ps.idProduct
+		WHERE ps.quantity < 50;
+
+-- Clientes que fizeram pedidos com valor acima de 2
+SELECT c.Fname, COUNT(o.idOrder) AS pedidos FROM client c
+JOIN orders o ON c.idClient = o.idClient
+	GROUP BY c.idClient
+		HAVING pedidos > 2;
+
+-- junção completa: pedidos, produtos, vendedor e entrega
+SELECT o.idOrder, c.Fname, p.Pname, s.SocialName AS vendedor, d.trackingCode, d.deliveryStatus FROM orders o
+	JOIN client c ON o.idClient = c.idClient
+		JOIN productOrder po ON o.idOrder = po.idOrder
+			JOIN product p ON po.idProduct = p.idProduct
+		JOIN productSeller ps ON p.idProduct = ps.idProduct
+	JOIN seller s ON ps.idSeller = s.idSeller
+JOIN delivery d ON o.idOrder = d.idOrder;
