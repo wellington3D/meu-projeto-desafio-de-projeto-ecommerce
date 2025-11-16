@@ -1,0 +1,140 @@
+use projeto_ecommerce;
+show tables;
+-- Clientes
+desc client;
+INSERT INTO client (Fname, Lname, CPF, CNPJ, Address) VALUES
+    ('Maria', 'Silva', '12345678902', NULL, 'Rua A, SP'),
+    ('LojaX', NULL, NULL,'12345678000199', 'Av B, RJ'),
+    ('Ana', 'Costa', '11122233340', NULL,'Rua das Palmeiras, 100 - SP'),
+    ('Carlos', 'Mendes', '55566677788',NULL, 'Av. Brasil, 200 - RJ'),
+    ('Loja Estilo',NULL, NULL,'12345678000193', 'Rua do Comércio, 50 - MG'),
+    ('Distribuidora Max',NULL,NULL, '98765432000188', 'Av. Industrial, 300 - PR');
+    
+select * FROM CLIENT;
+
+-- Produtos
+
+desc PRODUCT;
+INSERT INTO product (Pname, category, avaliação, size) VALUES
+    ('Fone', 'Eletronico', 4.5, 'M'),
+    ('Boneca', 'Brinquedos', 4.0, NULL),
+    ('Smartphone X', 'Eletronico', 4.7, '6.1'),
+    ('Camiseta Polo', 'Vestimenta', 4.2, 'M'),
+    ('Carrinho de Bebê', 'Brinquedos', 4.5, NULL),
+    ('Mesa de Jantar', 'Móveis', 4.0, '120x80'),
+    ('Biscoito Integral', 'Alimentos', 3.8, NULL);
+
+SELECT * FROM PRODUCT;
+
+-- Fornecedores
+DESC SUPPLIER;
+INSERT INTO supplier (SocialName, CNPJ, contact) VALUES
+    ('Distribuidora ABC', '11222333000188', '119999999992548'),
+    ('Tech Distribuidora', '11111111000199', '119999900001532'),
+    ('Moda Brasil', '22222222000188', '119888877775324'),
+    ('Baby Store', '33333333000177', '119777766661547');
+SELECT * FROM SUPPLIER; 
+
+-- Vendedores
+DESC SELLER;
+INSERT INTO seller (SocialName, CNPJ, CPF, location, contact)
+VALUES
+  ('Tech Vendas', '44444444000166',NULL, NULL,'11966665555'),
+  ('Estilo Moda', '55555555000155', NULL,NULL,'11955554444'),
+  ('Móveis & Cia', '66666666000144', NULL,NULL,'11944443333'),
+  ('Tech Vendas', '22333444000177', NULL,NULL,'11988888888');
+  
+SELECT * FROM seller;
+
+-- Relações
+DESC productSeller;
+INSERT INTO productSeller VALUES 
+                    (1, 1, 10),
+                    (1, 2, 20),
+                    (2, 3, 50),
+                    (3, 4, 10);
+                    
+SELECT * FROM productSeller;
+
+DESC productSupplier;
+INSERT INTO productSupplier VALUES 
+                    (1, 1, 100),
+                    (1, 2, 100),
+                    (2, 3, 200),
+                    (3, 4, 150);
+                    
+SELECT * FROM productSupplier;
+-- Estoque
+DESC productStorage;
+INSERT INTO productStorage (storageLocation, quantity) VALUES 
+            ('Galpão Central', 200),
+            ('Centro SP', 300),
+            ('Galpão RJ', 150);
+            
+SELECT * FROM productStorage;
+
+DESC storageLocation;
+INSERT INTO storageLocation (idProduct, idStorage, location) VALUES
+            (1, 1, 'Prateleira A'),
+            (2, 2, 'Prateleira B'),
+            (3, 1, 'Prateleira A');
+            
+SELECT * FROM storageLocation;
+
+-- Pedido
+INSERT INTO orders (idClient, orderStatus, orderDescription, sendValue) VALUES
+        (1, 'Confirmado', 'Compra via app', 20),
+        (1, 'Confirmado', 'Compra de smartphone', 25),
+        (2, 'Em processamento', 'Compra de camiseta', 15),
+        (3, 'Confirmado', 'Compra de carrinho', 30),
+        (4, 'Cancelado', 'Compra de mesa', 20),
+        (5, 'Confirmado', 'Compra de biscoito', 10),
+        (2, 'Em processamento', 'Compra de mesa', 25),
+        (3, 'Confirmado', 'Compra de brinquedo', 15),
+        (1, 'Cancelado', 'Compra de camiseta', 20);
+        
+SELECT * FROM orders;
+
+
+-- Entrega
+INSERT INTO delivery (idOrder, trackingCode, deliveryStatus) VALUES
+            (1, 'BR123456789SP', 'Enviado'),
+            (1, 'SP123456789BR', 'Entregue'),
+            (2, 'RJ987654321BR', 'Enviado'),
+            (3, 'MG456789123BR', 'Pendente'),
+            (5, 'SP000111222BR', 'Entregue'),
+            (6, 'RJ333444555BR', 'Pendente'),
+            (7, 'MG666777888BR', 'Enviado');
+
+SELECT * FROM delivery;
+
+-- Pagamento
+INSERT INTO payment (idOrder, method, amount) VALUES
+        (1, 'Pix', 120.00),
+        (1, 'Cartão', 30.00),
+        (1, 'Cartão', 120.00),
+        (1, 'Pix', 30.00),
+        (2, 'Boleto', 50.00),
+        (3, 'Dinheiro', 200.00),
+        (5, 'Pix', 10.00),
+        (6, 'Cartão', 25.00),
+        (7, 'Dinheiro', 15.00);
+
+SELECT * FROM payment;
+
+-- Produtos no pedido
+desc productOrder;
+INSERT INTO productOrder (idProduct, idOrder, quantity, status)
+VALUES
+  (1, 1, 2, 'Disponível'),
+  (2, 2, 2, 'Disponível'),
+  (3, 3, 1, 'Sem estoque'),
+  (4, 4, 1, 'Disponível'),
+  (5, 5, 3, 'Disponível'),
+  (4, 6, 1, 'Disponível'),
+  (3, 7, 2, 'Sem estoque')
+ON DUPLICATE KEY UPDATE
+  productOrder.quantity = productOrder.quantity + VALUES(quantity),
+  productOrder.status = VALUES(status);
+SELECT * FROM productOrder;
+            
